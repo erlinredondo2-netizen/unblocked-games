@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neon Cyber Runner</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      background: #0d1117;
+      color: #e6edf3;
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    .wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      width: 500px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #8b949e;
+    }
+    .hud strong { color: #f0883e; font-variant-numeric: tabular-nums; }
+    canvas {
+      background: #161b22;
+      border: 2px solid #30363d;
+      border-radius: 8px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+      cursor: pointer;
+    }
+    .hint {
+      font-size: 12px;
+      color: #8b949e;
+    }
+    @media (max-width: 540px) {
+      canvas { width: 340px; height: 180px; }
+      .hud { width: 340px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="hud">
+      <span>Score: <strong id="score">0</strong></span>
+      <span>Best: <strong id="best">0</strong></span>
+    </div>
+    <canvas id="c" width="500" height="240"></canvas>
+    <div class="hint">Press Space / Up or Tap to Jump. Down to Duck.</div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('c');
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('score');
+    const bestEl = document.getElementById('best');
+
+    let bestScore = localStorage.getItem('runner_best') || 0;
+    bestEl.textContent = bestScore;
+
+    const GROUND_Y = 190;
+    let score = 0;
+    let gameSpeed = 5;
+    let isGameOver = false;
+
+    const runner = {
+      x: 50,
+      y: GROUND_Y - 32,
+      w: 24,
+      h: 32,
+      vy: 0,
+      isGrounded: true,
+      isDucking: false
+    };
+
+    let obstacles = [];
+    let obstacleTimer = 0;
+
+    function reset() {
+      score = 0;
+      gameSpeed = 5;
+      isGameOver = false;
+      runner.y = GROUND_Y - 32;
+      runner.h = 32;
+      runner.vy = 0;
+      runner.isGrounded = true;
+      runner.isDucking = false;
+      obstacles = [];
+      obstacleTimer = 0;
+    }
+
+    function jump() {
+      if (isGameOver) {
+        reset();
+        return;
+      }
+      if (runner.isGrounded) {
+        runner.vy = -10.5;
+        runner.isGrounded = false;
+      }
+    }
+
+    function update() {
+      if (isGameOver) return;
+
+      score++;
+      if (score % 100 === 0) {
+        gameSpeed = Math.min(11, gameSpeed + 0.2);
+      }
+      scoreEl.textContent = Math.floor(score / 5);
+      if (Math.floor(score / 5) > bestScore) {
+        bestScore = Math.floor(score / 5);
+        bestEl.textContent = bestScore;
+        localStorage.setItem('runner_best', bestScore);
+      }
+
+      // Physics
+      runner.vy += 0.55;
+      runner.y += runner.vy;
+
+      const currentH = runner.isDucking ? 18 : 32;
+      if (runner.y + currentH >= GROUND_Y) {
+        runner.y = GROUND_Y - currentH;
+        runner.vy = 0;
+        runner.isGrounded = true;
+      }
+
+      // Obstacles
+      obstacleTimer++;
+      if (obstacleTimer > Math.max(50, 110 - gameSpeed * 5)) {
+        obstacleTimer = 0;
+        const isAir = Math.random() < 0.3 && score > 200;
+        if (isAir) {
+          obstacles.push({ x: canvas.width, y: GROUND_Y - 36, w: 22, h: 14, type: 'drone' });
+        } else {
+          const w = Math.random() < 0.5 ? 18 : 28;
+          const h = Math.random() < 0.5 ? 26 : 34;
+          obstacles.push({ x: canvas.width, y: GROUND_Y - h, w, h, type: 'spikes' });
+        }
+      }
+
+      // Move obstacles
+      for (let i = obstacles.length - 1; i >= 0; i--) {
+        const obs = obstacles[i];
+        obs.x -= gameSpeed;
+
+        // Collision check
+        const runnerW = runner.w;
+        const hitX = runner.x + runnerW > obs.x && runner.x < obs.x + obs.w;
+        const hitY = runner.y + currentH > obs.y && runner.y < obs.y + obs.h;
+        if (hitX && hitY) {
+          isGameOver = true;
+        }
+
+        if (obs.x < -40) obstacles.splice(i, 1);
+      }
+    }
+
+    function draw() {
+      ctx.fillStyle = '#161b22';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Stars/City line
+      ctx.strokeStyle = '#21262d';
+      ctx.lineWidth = 1;
+      for (let x = (score * -1) % 40; x < canvas.width; x += 40) {
+        ctx.beginPath();
+        ctx.moveTo(x, 140);
+        ctx.lineTo(x, GROUND_Y);
+        ctx.stroke();
+      }
+
+      // Ground
+      ctx.fillStyle = '#30363d';
+      ctx.fillRect(0, GROUND_Y, canvas.width, 2);
+      ctx.fillStyle = '#0d1117';
+      ctx.fillRect(0, GROUND_Y + 2, canvas.width, canvas.height - GROUND_Y);
+
+      // Obstacles
+      obstacles.forEach(o => {
+        if (o.type === 'spikes') {
+          ctx.fillStyle = '#f85149';
+          ctx.beginPath();
+          ctx.moveTo(o.x, o.y + o.h);
+          ctx.lineTo(o.x + o.w / 2, o.y);
+          ctx.lineTo(o.x + o.w, o.y + o.h);
+          ctx.closePath();
+          ctx.fill();
+        } else {
+          ctx.fillStyle = '#eab308';
+          ctx.fillRect(o.x, o.y, o.w, o.h);
+        }
+      });
+
+      // Runner
+      const currentH = runner.isDucking ? 18 : 32;
+      ctx.fillStyle = '#58a6ff';
+      ctx.beginPath();
+      ctx.roundRect(runner.x, runner.y, runner.w, currentH, 4);
+      ctx.fill();
+
+      // Eye
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(runner.x + runner.w - 7, runner.y + 4, 4, 4);
+
+      if (isGameOver) {
+        ctx.fillStyle = 'rgba(13, 17, 23, 0.85)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#f85149';
+        ctx.font = 'bold 22px system-ui';
+        ctx.textAlign = 'center';
+        ctx.fillText('CRASHED!', canvas.width / 2, canvas.height / 2 - 10);
+        ctx.fillStyle = '#8b949e';
+        ctx.font = '14px system-ui';
+        ctx.fillText('Press Space / Tap to Retry', canvas.width / 2, canvas.height / 2 + 18);
+      }
+    }
+
+    function loop() {
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === ' ' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        jump();
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        runner.isDucking = true;
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      if (e.key === 'ArrowDown') {
+        runner.isDucking = false;
+      }
+    });
+
+    canvas.addEventListener('click', jump);
+    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); jump(); }, { passive: false });
+
+    reset();
+    loop();
+  </script>
+</body>
+</html>

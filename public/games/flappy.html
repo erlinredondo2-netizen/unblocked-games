@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flappy Sky Flight</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      background: #0d1117;
+      color: #e6edf3;
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    .wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      width: 360px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #8b949e;
+    }
+    .hud span strong { color: #f0883e; font-variant-numeric: tabular-nums; }
+    canvas {
+      background: #09131e;
+      border: 2px solid #30363d;
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+      cursor: pointer;
+    }
+    .hint {
+      font-size: 12px;
+      color: #8b949e;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="hud">
+      <span>Score: <strong id="score">0</strong></span>
+      <span>Best: <strong id="best">0</strong></span>
+    </div>
+    <canvas id="c" width="360" height="520"></canvas>
+    <div class="hint">Click / Tap or press Space to Flap</div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('c');
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('score');
+    const bestEl = document.getElementById('best');
+
+    let bestScore = localStorage.getItem('flappy_best') || 0;
+    bestEl.textContent = bestScore;
+
+    let bird = { x: 60, y: 220, vy: 0, rad: 14 };
+    const GRAV = 0.32;
+    const JUMP = -6.2;
+    let pipes = [];
+    let pipeTimer = 0;
+    let score = 0;
+    let state = 'ready'; // ready, playing, gameover
+
+    function reset() {
+      bird = { x: 60, y: 220, vy: 0, rad: 14 };
+      pipes = [];
+      pipeTimer = 0;
+      score = 0;
+      scoreEl.textContent = score;
+      state = 'ready';
+    }
+
+    function flap() {
+      if (state === 'ready') {
+        state = 'playing';
+        bird.vy = JUMP;
+      } else if (state === 'playing') {
+        bird.vy = JUMP;
+      } else if (state === 'gameover') {
+        reset();
+      }
+    }
+
+    function update() {
+      if (state === 'playing') {
+        bird.vy += GRAV;
+        bird.y += bird.vy;
+
+        // Ground / Ceiling
+        if (bird.y + bird.rad > canvas.height - 20) {
+          bird.y = canvas.height - 20 - bird.rad;
+          gameOver();
+        }
+        if (bird.y - bird.rad < 0) {
+          bird.y = bird.rad;
+          bird.vy = 0;
+        }
+
+        // Pipes
+        pipeTimer++;
+        if (pipeTimer > 100) {
+          pipeTimer = 0;
+          const gap = 120;
+          const topH = Math.floor(Math.random() * (canvas.height - gap - 120)) + 40;
+          pipes.push({
+            x: canvas.width,
+            top: topH,
+            bottom: canvas.height - topH - gap,
+            passed: false
+          });
+        }
+
+        for (let i = pipes.length - 1; i >= 0; i--) {
+          const p = pipes[i];
+          p.x -= 2;
+
+          // Check pass
+          if (!p.passed && p.x + 50 < bird.x) {
+            p.passed = true;
+            score++;
+            scoreEl.textContent = score;
+            if (score > bestScore) {
+              bestScore = score;
+              bestEl.textContent = bestScore;
+              localStorage.setItem('flappy_best', bestScore);
+            }
+          }
+
+          // Collision
+          const inPipeX = bird.x + bird.rad > p.x && bird.x - bird.rad < p.x + 50;
+          const hitTop = bird.y - bird.rad < p.top;
+          const hitBottom = bird.y + bird.rad > canvas.height - p.bottom;
+          if (inPipeX && (hitTop || hitBottom)) {
+            gameOver();
+          }
+
+          if (p.x < -60) pipes.splice(i, 1);
+        }
+      }
+    }
+
+    function gameOver() {
+      state = 'gameover';
+    }
+
+    function draw() {
+      // Sky background gradient
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      bgGrad.addColorStop(0, '#0d1e33');
+      bgGrad.addColorStop(1, '#1b324d');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Cloud silhouettes
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+      ctx.beginPath();
+      ctx.arc(80, 120, 40, 0, Math.PI * 2);
+      ctx.arc(120, 110, 50, 0, Math.PI * 2);
+      ctx.arc(160, 120, 40, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Pipes
+      pipes.forEach(p => {
+        // Top pipe
+        const gradT = ctx.createLinearGradient(p.x, 0, p.x + 50, 0);
+        gradT.addColorStop(0, '#238636');
+        gradT.addColorStop(0.5, '#2ea043');
+        gradT.addColorStop(1, '#1b6426');
+        ctx.fillStyle = gradT;
+        ctx.fillRect(p.x, 0, 50, p.top);
+        ctx.fillStyle = '#3fb950';
+        ctx.fillRect(p.x - 3, p.top - 16, 56, 16);
+
+        // Bottom pipe
+        const bottomY = canvas.height - p.bottom;
+        ctx.fillStyle = gradT;
+        ctx.fillRect(p.x, bottomY, 50, p.bottom);
+        ctx.fillStyle = '#3fb950';
+        ctx.fillRect(p.x - 3, bottomY, 56, 16);
+      });
+
+      // Ground
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
+      ctx.fillStyle = '#388bfd';
+      ctx.fillRect(0, canvas.height - 20, canvas.width, 3);
+
+      // Bird
+      ctx.save();
+      ctx.translate(bird.x, bird.y);
+      const angle = Math.min(Math.PI / 4, Math.max(-Math.PI / 4, (bird.vy * 4) * Math.PI / 180));
+      ctx.rotate(angle);
+
+      // Body
+      ctx.fillStyle = '#f0883e';
+      ctx.beginPath();
+      ctx.arc(0, 0, bird.rad, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Belly
+      ctx.fillStyle = '#ffd33d';
+      ctx.beginPath();
+      ctx.arc(-2, 4, bird.rad - 6, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Eye
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(6, -4, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#000000';
+      ctx.beginPath();
+      ctx.arc(7, -4, 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Beak
+      ctx.fillStyle = '#f85149';
+      ctx.beginPath();
+      ctx.moveTo(10, -1);
+      ctx.lineTo(18, 2);
+      ctx.lineTo(10, 5);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.restore();
+
+      // Overlays
+      if (state === 'ready') {
+        ctx.fillStyle = 'rgba(0,0,0,0.4)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#e6edf3';
+        ctx.font = 'bold 22px system-ui';
+        ctx.textAlign = 'center';
+        ctx.fillText('FLAPPY SKY', canvas.width / 2, canvas.height / 2 - 20);
+        ctx.fillStyle = '#8b949e';
+        ctx.font = '14px system-ui';
+        ctx.fillText('Tap or Press Space to Start', canvas.width / 2, canvas.height / 2 + 16);
+      } else if (state === 'gameover') {
+        ctx.fillStyle = 'rgba(13, 17, 23, 0.8)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#f85149';
+        ctx.font = 'bold 26px system-ui';
+        ctx.textAlign = 'center';
+        ctx.fillText('CRASHED!', canvas.width / 2, canvas.height / 2 - 30);
+        ctx.fillStyle = '#e6edf3';
+        ctx.font = '16px system-ui';
+        ctx.fillText(`Score: ${score}`, canvas.width / 2, canvas.height / 2 + 6);
+        ctx.fillStyle = '#8b949e';
+        ctx.font = '13px system-ui';
+        ctx.fillText('Tap or Press Space to Restart', canvas.width / 2, canvas.height / 2 + 36);
+      }
+    }
+
+    function loop() {
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === ' ' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        flap();
+      }
+    });
+    canvas.addEventListener('click', flap);
+    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); flap(); }, { passive: false });
+
+    reset();
+    loop();
+  </script>
+</body>
+</html>

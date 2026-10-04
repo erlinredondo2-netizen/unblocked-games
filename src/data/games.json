@@ -1,0 +1,177 @@
+[
+  {
+    "id": "retro-snake",
+    "title": "Retro Snake 97",
+    "category": "Retro",
+    "description": "The classic arcade snake game. Eat apples to grow, avoid running into walls or your own tail, and challenge your high score.",
+    "author": "Nexus Games",
+    "color": "from-emerald-600 to-teal-800",
+    "accentColor": "#10b981",
+    "icon": "Gamepad2",
+    "iframe": "<iframe src=\"/games/snake.html\" width=\"100%\" height=\"520\" frameborder=\"0\" allowfullscreen=\"true\" allow=\"gamepad; autoplay\"></iframe>",
+    "iframeSrc": "/games/snake.html",
+    "controls": [
+      { "key": "Arrow Keys / WASD", "action": "Change Direction" },
+      { "key": "Spacebar", "action": "Pause / Resume / Restart" }
+    ],
+    "tags": ["Snake", "Retro", "Classic", "Arcade"],
+    "rating": 4.9,
+    "plays": 14200
+  },
+  {
+    "id": "block-drop-tetris",
+    "title": "Block Drop Tetris",
+    "category": "Puzzle",
+    "description": "Classic falling block puzzle. Rotate, position and clear full rows of tetrominoes to level up and reach the highest score.",
+    "author": "Nexus Games",
+    "color": "from-cyan-600 to-blue-800",
+    "accentColor": "#06b6d4",
+    "icon": "Boxes",
+    "iframe": "<iframe src=\"/games/tetris.html\" width=\"100%\" height=\"560\" frameborder=\"0\" allowfullscreen=\"true\" allow=\"gamepad; autoplay\"></iframe>",
+    "iframeSrc": "/games/tetris.html",
+    "controls": [
+      { "key": "Left / Right", "action": "Move Piece" },
+      { "key": "Up Arrow", "action": "Rotate Piece" },
+      { "key": "Down Arrow", "action": "Soft Drop" },
+      { "key": "Spacebar", "action": "Hard Drop Instantly" },
+      { "key": "P", "action": "Pause Game" }
+    ],
+    "tags": ["Tetris", "Puzzle", "Blocks", "Strategy"],
+    "rating": 4.9,
+    "plays": 28400
+  },
+  {
+    "id": "classic-2048",
+    "title": "2048 Classic",
+    "category": "Puzzle",
+    "description": "Slide numbered tiles across the 4x4 grid. When two identical numbers collide, they merge into one. Can you hit 2048?",
+    "author": "Nexus Games",
+    "color": "from-amber-600 to-orange-800",
+    "accentColor": "#f59e0b",
+    "icon": "Layers",
+    "iframe": "<iframe src=\"/games/2048.html\" width=\"100%\" height=\"520\" frameborder=\"0\" allowfullscreen=\"true\" allow=\"gamepad; autoplay\"></iframe>",
+    "iframeSrc": "/games/2048.html",
+    "controls": [
+      { "key": "Arrow Keys", "action": "Slide All Tiles" },
+      { "key": "Swipe", "action": "Slide on Touch Devices" }
+    ],
+    "tags": ["2048", "Math", "Puzzle", "Brain"],
+    "rating": 4.8,
+    "plays": 19500
+  },
+  {
+    "id": "flappy-sky",
+    "title": "Flappy Sky Flight",
+    "category": "Arcade",
+    "description": "Tap or press space to flap your wings and navigate between pipes. Precision timing is everything in this addictive flyer.",
+    "author": "Nexus Games",
+    "color": "from-sky-600 to-indigo-800",
+    "accentColor": "#0ea5e9",
+    "icon": "Bird",
+    "iframe": "<iframe src=\"/games/flappy.html\" width=\"100%\" height=\"560\" frameborder=\"0\" allowfullscreen=\"true\" allow=\"gamepad; autoplay\"></iframe>",
+    "iframeSrc": "/games/flappy.html",
+    "controls": [
+      { "key": "Spacebar / Up", "action": "Flap Wings" },
+      { "key": "Click / Tap", "action": "Flap on Touch" }
+    ],
+    "tags": ["Flappy", "Skill", "Hard", "One-button"],
+    "rating": 4.7,
+    "plays": 31200
+  },
+  {
+    "id": "neon-brick-breaker",
+    "title": "Neon Brick Breaker",
+    "category": "Arcade",
+    "description": "Classic Breakout action. Move your paddle to bounce the ball, destroy rows of neon bricks, and clear challenging stages.",
+    "author": "Nexus Games",
+    "color": "from-violet-600 to-purple-900",
+    "accentColor": "#8b5cf6",
+    "icon": "Target",
+    "iframe": "<iframe src=\"/games/breakout.html\" width=\"100%\" height=\"500\" frameborder=\"0\" allowfullscreen=\"true\" allow=\"gamepad; autoplay\"></iframe>",
+    "iframeSrc": "/games/breakout.html",
+    "controls": [
+      { "key": "Mouse / Touch", "action": "Move Paddle" },
+      { "key": "Spacebar / Click", "action": "Launch Ball" }
+    ],
+    "tags": ["Breakout", "Bricks", "Arcade", "Retro"],
+    "rating": 4.8,
+    "plays": 16700
+  },
+  {
+    "id": "cosmic-defender",
+    "title": "Cosmic Galaxy Defender",
+    "category": "Action",
+    "description": "Defend the star system against descending alien armadas. Dodge enemy laser fire, survive intense waves, and upgrade your score.",
+    "author": "Nexus Games",
+    "color": "from-rose-600 to-red-900",
+    "accentColor": "#f43f5e",
+    "icon": "Rocket",
+    "iframe": "<iframe src=\"/games/space-shooter.html\" width=\"100%\" height=\"560\" frameborder=\"0\" allowfullscreen=\"true\" allow=\"gamepad; autoplay\"></iframe>",
+    "iframeSrc": "/games/space-shooter.html",
+    "controls": [
+      { "key": "A / D or Left / Right", "action": "Move Ship" },
+      { "key": "Spacebar or Click", "action": "Fire Laser Cannons" }
+    ],
+    "tags": ["Shooter", "Action", "Space", "Invaders"],
+    "rating": 4.9,
+    "plays": 22100
+  },
+  {
+    "id": "retro-minesweeper",
+    "title": "Retro Minesweeper",
+    "category": "Puzzle",
+    "description": "Uncover numbers that tell how many hidden mines surround each cell. Flag dangerous spots and clear the entire grid safely.",
+    "author": "Nexus Games",
+    "color": "from-slate-600 to-zinc-800",
+    "accentColor": "#64748b",
+    "icon": "Bomb",
+    "iframe": "<iframe src=\"/games/minesweeper.html\" width=\"100%\" height=\"500\" frameborder=\"0\" allowfullscreen=\"true\" allow=\"gamepad; autoplay\"></iframe>",
+    "iframeSrc": "/games/minesweeper.html",
+    "controls": [
+      { "key": "Left Click", "action": "Reveal Square" },
+      { "key": "Right Click", "action": "Plant Flag (🚩)" },
+      { "key": "Smiley Face", "action": "Restart Game" }
+    ],
+    "tags": ["Minesweeper", "Logic", "Strategy", "Classic"],
+    "rating": 4.7,
+    "plays": 11800
+  },
+  {
+    "id": "cyber-pong",
+    "title": "Arcade Cyber Pong",
+    "category": "Sports",
+    "description": "High-octane table tennis simulator with fast bouncing rallies. Play solo against smart CPU AI or challenge a friend in 2-player local mode.",
+    "author": "Nexus Games",
+    "color": "from-blue-600 to-indigo-900",
+    "accentColor": "#3b82f6",
+    "icon": "Trophy",
+    "iframe": "<iframe src=\"/games/pong.html\" width=\"100%\" height=\"460\" frameborder=\"0\" allowfullscreen=\"true\" allow=\"gamepad; autoplay\"></iframe>",
+    "iframeSrc": "/games/pong.html",
+    "controls": [
+      { "key": "W / S or Mouse", "action": "Player 1 Paddle" },
+      { "key": "Up / Down Arrows", "action": "Player 2 Paddle" }
+    ],
+    "tags": ["Pong", "2-Player", "Sports", "Arcade"],
+    "rating": 4.8,
+    "plays": 18200
+  },
+  {
+    "id": "neon-cyber-runner",
+    "title": "Neon Cyber Runner",
+    "category": "Action",
+    "description": "Fast-paced endless side-runner through a futuristic cyber skyline. Jump over spike barricades and duck under aerial drones as speed increases.",
+    "author": "Nexus Games",
+    "color": "from-emerald-600 to-cyan-800",
+    "accentColor": "#10b981",
+    "icon": "Zap",
+    "iframe": "<iframe src=\"/games/runner.html\" width=\"100%\" height=\"360\" frameborder=\"0\" allowfullscreen=\"true\" allow=\"gamepad; autoplay\"></iframe>",
+    "iframeSrc": "/games/runner.html",
+    "controls": [
+      { "key": "Space / Up", "action": "Jump" },
+      { "key": "Down Arrow", "action": "Duck / Slide" }
+    ],
+    "tags": ["Runner", "Endless", "Speed", "Reflex"],
+    "rating": 4.9,
+    "plays": 24900
+  }
+]
